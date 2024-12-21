@@ -1,4 +1,4 @@
-# Movie Recommendation System
+# Movie Recommendation System: Using Google Cloud Storage and CSV Data with Advanced Libraries for Personalized Insights
 
 A simple **Movie Recommendation System** built using Flask, Python, and Scikit-learn, complete with a user-friendly interface for providing personalized movie suggestions based on collaborative filtering.
 
@@ -21,7 +21,6 @@ A simple **Movie Recommendation System** built using Flask, Python, and Scikit-l
 13. License
 14. Extra Colab Source for Data Merging
 ```
-
 ```
 ## 🎯 Introduction
 
@@ -44,7 +43,8 @@ This project demonstrates the implementation of a collaborative filtering-based 
 - **Backend:** Flask (Python)  
 - **Frontend:** HTML5, CSS3  
 - **Machine Learning:** Scikit-learn  
-- **Dependencies:** pandas, NumPy  
+- **Dependencies:** pandas, NumPy
+- **Data Storage : Buckets(GCP)
 - **Hosting:** Flask built-in server
 ```
 
@@ -54,8 +54,10 @@ This project demonstrates the implementation of a collaborative filtering-based 
 ### Prerequisites  
 
 - Python 3.7 or above.  
-- Virtual environment (optional but recommended).  
+- Virtual environment (optional but recommended).
+- Some Familiar with Google Cloud [Buckets].
 - Kaggle API key for downloading datasets.
+- Using Pandas , Flask library.
 
 ### Steps  
 
@@ -66,26 +68,30 @@ This project demonstrates the implementation of a collaborative filtering-based 
    ```  
 
 2. Download the dataset from Kaggle:  
-   ```bash  
-   kaggle datasets download -d <kaggle-dataset-identifier>  
-   unzip <dataset-name>.zip -d data/  
+   ```bash   
+
+   https:https://www.kaggle.com/datasets/hassanelfattmi/which-movie-should-i-watch-today
+   unzip the data set.zip -d data/
    ```  
 
 3. Install required dependencies:  
    ```bash  
-   pip install -r requirements.txt  
+   pip install -r requirements.txt
+   pip install scikit-learn
+   pip install Flask
    ```  
 
 4. Run the application:  
    ```bash  
    python app.py  
    ```
+   For my Suggestion Use VS Code.
 ```
 
 ```
 ## 🚀 How It Works  
 
-1. **Input:** User provides their User ID.  
+1. **Input:** User provides their Rating he want and Genres and Languages.  
 2. **Processing:**  
    - A pivot table is generated from user-item interaction data.  
    - k-NN algorithm identifies similar users using cosine similarity.  
@@ -117,17 +123,18 @@ movie-recommendation-system/
 ```
 ## 📊 Data Source  
 
-- **Dataset:** [Movies Dataset on Kaggle](https://www.kaggle.com/).  
+- **Dataset:** [Movies Dataset on Kaggle](https://www.kaggle.com/datasets/hassanelfattmi/which-movie-should-i-watch-today).
+- Data use to Store in Google Cloud Buckets . 
 - Ensure you have your Kaggle API key for dataset download.
 ```
 
 ```
 ## 📝 Sample Inputs  
 
-- **Example User IDs:**  
-  Valid IDs include 1, 2, 3.  
+- **Example Rating :**  
+  Valid IDs include 7 , 8 , 9 .  
 
-- **Example Output for User ID 1:**  
+- **Example Output for  8:**  
   Recommended Movies: `Inception`, `The Dark Knight`, `Interstellar`.
 ```
 
@@ -136,7 +143,7 @@ movie-recommendation-system/
 
 The web application uses a minimalist and responsive design. The CSS file located in `static/styles.css` ensures seamless interaction across devices.
 ```
-
+Which includes just Background image and interactive page.
 ```
 ## 🌐 Live Demo  
 
@@ -186,7 +193,14 @@ Check out the live application:
 This project is licensed under the **MIT License**.
 ```
 
-
+```
 ###Extra Colab Source for Data Merging
 ```
-https://colab.research.google.com/drive/1Qdavm3oJDefyNdCNVK_Z0yM8s-ywF5vt?usp=sharing
+https://colab.research.google.com/drive/1Qdavm3oJDefyNdCNVK_Z0yM8s-ywF5vt?usp=sharing.
+```
+
+
+
+###
+-
+                                                 THANK💚YOU
