@@ -1,4 +1,4 @@
-# Movie Recommendation System: Using Google Cloud Storage and CSV Data with Advanced Libraries for Personalized Insights
+# Movie Recommendations: Personalized Film Suggestions
 
 A simple **Movie Recommendation System** built using Flask, Python, and Scikit-learn, complete with a user-friendly interface for providing personalized movie suggestions based on collaborative filtering.
 
