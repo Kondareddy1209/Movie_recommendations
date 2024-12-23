@@ -1,6 +1,11 @@
 # Movie Recommendations: Personalized Film Suggestions
 
 A simple **Movie Recommendation System** built using Flask, Python, and Scikit-learn, complete with a user-friendly interface for providing personalized movie suggestions based on collaborative filtering.
+```
+### Result
+```
+![Screenshot 2024-12-21 194746](https://github.com/user-attachments/assets/a90d2d07-0bce-441e-b626-50bfafeffb6e)
+```
 
 ```
 # 📖 Table of Contents
@@ -201,6 +206,10 @@ https://colab.research.google.com/drive/1Qdavm3oJDefyNdCNVK_Z0yM8s-ywF5vt?usp=sh
 
 
 
+
+
+
+```
 ###
 -
                                                  THANK💚YOU
