@@ -3,43 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Recommendation</title>
+    <meta name="description" content="Machine Learning Movie Recommendation System using k-Nearest Neighbors and Content-Based Filtering">
+    <title>Movie Recommendation System | ML Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Movie Recommendation System</h1>
-    <form method="POST" action="/recommend">
-        <label for="user_score">Minimum User Score:</label>
-        <input type="number" step="0.1" id="user_score" name="user_score" required><br><br>
+    <header class="hero-header">
+        <div class="container header-container">
+            <div class="logo-area">
+                <span class="logo-icon">🎬</span>
+                <div>
+                    <h1 class="site-title">CineMatch ML</h1>
+                    <p class="site-subtitle">Content-Based k-NN & Multi-Criteria Movie Recommendation Engine</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-accent">9,718 Movies</span>
+                <span class="badge badge-outline">k-NN & Cosine Similarity</span>
+            </div>
+        </div>
+    </header>
 
-        <label for="genre">Genre:</label>
-        <select id="genre" name="genre">
-            <option value="">--Select Genre--</option>
-            {% for g in genres %}
-                <option value="{{ g }}">{{ g }}</option>
-            {% endfor %}
-        </select><br><br>
+    <main class="container main-content">
+        <!-- Control Panel Section -->
+        <section class="search-panel-card">
+            <div class="tabs-nav">
+                <button type="button" class="tab-btn active" id="tab-similarity" onclick="switchTab('similarity')">
+                    🎯 Recommend by Similar Movie
+                </button>
+                <button type="button" class="tab-btn" id="tab-filter" onclick="switchTab('filter')">
+                    🎛️ Filter by Score & Genre
+                </button>
+            </div>
 
-        <label for="language">Language:</label>
-        <select id="language" name="language">
-            <option value="">--Select Language--</option>
-            {% for l in languages %}
-                <option value="{{ l }}">{{ l }}</option>
-            {% endfor %}
-        </select><br><br>
+            <!-- Mode 1: Similar Movie Search -->
+            <form id="form-similarity" method="POST" action="/recommend" class="search-form">
+                <div class="form-group full-width">
+                    <label for="title-input" class="form-label">Search Movie Title for Similar Recommendations:</label>
+                    <div class="search-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="title-input" 
+                            name="title" 
+                            class="form-control form-control-lg" 
+                            placeholder="e.g. The Godfather, Inception, Interstellar, Pulp Fiction..." 
+                            value="{{ selected_title or '' }}"
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="btn btn-primary">Find Similar Movies</button>
+                    </div>
+                    <div class="quick-tags">
+                        <span class="quick-tag-label">Popular queries:</span>
+                        <a href="/recommend?title=The+Godfather" class="quick-tag">The Godfather</a>
+                        <a href="/recommend?title=Inception" class="quick-tag">Inception</a>
+                        <a href="/recommend?title=Pulp+Fiction" class="quick-tag">Pulp Fiction</a>
+                        <a href="/recommend?title=Interstellar" class="quick-tag">Interstellar</a>
+                        <a href="/recommend?title=Spirited+Away" class="quick-tag">Spirited Away</a>
+                    </div>
+                </div>
+            </form>
 
-        <button type="submit">Get Recommendations</button>
-    </form>
+            <!-- Mode 2: Multi-Criteria Filter -->
+            <form id="form-filter" method="POST" action="/recommend" class="search-form" style="display: none;">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="genre-select" class="form-label">Genre:</label>
+                        <select id="genre-select" name="genre" class="form-control">
+                            <option value="">All Genres</option>
+                            {% for g in genres %}
+                                <option value="{{ g }}" {% if selected_genre == g %}selected{% endif %}>{{ g }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-    {% if recommendations %}
-        <h2>Recommendations:</h2>
-        <ul>
-            {% for movie in recommendations %}
-                <li>{{ movie }}</li>
-            {% endfor %}
-        </ul>
-    {% elif error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
+                    <div class="form-group">
+                        <label for="language-select" class="form-label">Language:</label>
+                        <select id="language-select" name="language" class="form-control">
+                            <option value="">All Languages</option>
+                            {% for l in languages %}
+                                <option value="{{ l }}" {% if selected_language == l %}selected{% endif %}>{{ l }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user-score-input" class="form-label">Minimum User Score (0.0 - 10.0):</label>
+                        <input 
+                            type="number" 
+                            step="0.1" 
+                            min="0" 
+                            max="10" 
+                            id="user-score-input" 
+                            name="user_score" 
+                            class="form-control" 
+                            placeholder="e.g. 8.0" 
+                            value="{{ selected_user_score or '' }}"
+                        >
+                    </div>
+
+                    <div class="form-group filter-submit-group">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-accent full-width">Filter Movies</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Notification Banner / Errors -->
+        {% if error %}
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
+
+        <!-- Target Movie Highlight (if Similarity Query) -->
+        {% if target_movie %}
+            <section class="target-movie-section">
+                <h3 class="section-label">Source Film Queried</h3>
+                <div class="target-card">
+                    {% if target_movie.poster_path %}
+                        <img src="{{ target_movie.poster_path }}" alt="{{ target_movie.title }}" class="target-poster" loading="lazy" onerror="this.src='/static/Designer.jpeg'">
+                    {% else %}
+                        <div class="target-poster-placeholder">🎬</div>
+                    {% endif %}
+                    <div class="target-details">
+                        <div class="target-header-row">
+                            <h2 class="target-title">{{ target_movie.title }}</h2>
+                            <span class="score-pill">⭐ {{ target_movie.user_score }} / 10</span>
+                        </div>
+                        <p class="target-meta">
+                            <span>📅 {{ target_movie.release_date or 'N/A' }}</span> • 
+                            <span>⏱️ {{ target_movie.runtime_hour }}h {{ target_movie.runtime_min }}m</span> • 
+                            <span>🗣️ {{ target_movie.language|upper }}</span>
+                        </p>
+                        <p class="target-genres">
+                            {% for g in target_movie.genres.split(',') %}
+                                <span class="genre-tag">{{ g.strip() }}</span>
+                            {% endfor %}
+                        </p>
+                        <p class="target-credits">
+                            <strong>Director:</strong> {{ target_movie.director or 'Unknown' }}<br>
+                            <strong>Cast:</strong> {{ target_movie.top_billed or 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Recommendations Results Grid -->
+        {% if recommendations %}
+            <section class="results-section">
+                <div class="section-header-bar">
+                    <h2 class="section-title">
+                        {% if target_movie %}
+                            Recommended Similar Movies (k-NN Cosine Similarity)
+                        {% elif selected_genre or selected_language or selected_user_score %}
+                            Filtered Recommendations ({{ recommendations|length }} results)
+                        {% else %}
+                            Recommendations
+                        {% endif %}
+                    </h2>
+                </div>
+
+                <div class="movies-grid">
+                    {% for movie in recommendations %}
+                        <article class="movie-card">
+                            <div class="poster-container">
+                                {% if movie.poster_path %}
+                                    <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy" onerror="this.src='/static/Designer.jpeg'">
+                                {% else %}
+                                    <div class="movie-poster-placeholder">🎬</div>
+                                {% endif %}
+                                <div class="poster-overlay">
+                                    <span class="score-badge">⭐ {{ "%.1f"|format(movie.user_score) }}</span>
+                                    {% if movie.similarity_score is defined %}
+                                        <span class="similarity-badge">Match {{ "%.0f"|format(movie.similarity_score * 100) }}%</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="movie-info">
+                                <h3 class="movie-title" title="{{ movie.title }}">{{ movie.title }}</h3>
+                                <div class="movie-meta-row">
+                                    <span class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+                                    <span class="movie-lang">{{ movie.language|upper }}</span>
+                                    <span class="movie-runtime">{{ movie.runtime_hour }}h {{ movie.runtime_min }}m</span>
+                                </div>
+                                <div class="movie-genres-row">
+                                    {% for g in movie.genres.split(',')[:3] %}
+                                        <span class="genre-pill">{{ g.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="movie-credits-mini">
+                                    <small class="director-text"><strong>Dir:</strong> {{ movie.director or 'Unknown' }}</small>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% elif not error and featured_movies %}
+            <!-- Initial Featured Top Rated Movies -->
+            <section class="results-section">
+                <div class="section-header-bar">
+                    <h2 class="section-title">🌟 Top Rated Highlights</h2>
+                    <p class="section-desc">Explore highly rated films from our 9,718 movie catalog or use the search controls above.</p>
+                </div>
+
+                <div class="movies-grid">
+                    {% for movie in featured_movies %}
+                        <article class="movie-card">
+                            <div class="poster-container">
+                                {% if movie.poster_path %}
+                                    <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy" onerror="this.src='/static/Designer.jpeg'">
+                                {% else %}
+                                    <div class="movie-poster-placeholder">🎬</div>
+                                {% endif %}
+                                <div class="poster-overlay">
+                                    <span class="score-badge">⭐ {{ "%.1f"|format(movie.user_score) }}</span>
+                                </div>
+                            </div>
+                            <div class="movie-info">
+                                <h3 class="movie-title" title="{{ movie.title }}">{{ movie.title }}</h3>
+                                <div class="movie-meta-row">
+                                    <span class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+                                    <span class="movie-lang">{{ movie.language|upper }}</span>
+                                    <span class="movie-runtime">{{ movie.runtime_hour }}h {{ movie.runtime_min }}m</span>
+                                </div>
+                                <div class="movie-genres-row">
+                                    {% for g in movie.genres.split(',')[:3] %}
+                                        <span class="genre-pill">{{ g.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="movie-credits-mini">
+                                    <small class="director-text"><strong>Dir:</strong> {{ movie.director or 'Unknown' }}</small>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <p><strong>CineMatch</strong> — Machine Learning Movie Recommendation System.</p>
+            <p class="tech-stack-line">Built with Python, Scikit-learn (k-NN & Cosine Similarity), Flask & Streamlit.</p>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(mode) {
+            const formSim = document.getElementById('form-similarity');
+            const formFilter = document.getElementById('form-filter');
+            const tabSim = document.getElementById('tab-similarity');
+            const tabFilter = document.getElementById('tab-filter');
+
+            if (mode === 'similarity') {
+                formSim.style.display = 'block';
+                formFilter.style.display = 'none';
+                tabSim.classList.add('active');
+                tabFilter.classList.remove('active');
+            } else {
+                formSim.style.display = 'none';
+                formFilter.style.display = 'block';
+                tabFilter.classList.add('active');
+                tabSim.classList.remove('active');
+            }
+        }
+
+        // Initialize active tab based on backend search_type
+        {% if search_type == 'filter' %}
+            switchTab('filter');
+        {% else %}
+            switchTab('similarity');
+        {% endif %}
+    </script>
 </body>
 </html>

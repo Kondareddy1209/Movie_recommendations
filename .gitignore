@@ -1,0 +1,37 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Specific Service Account and Credential patterns
+*service-account*.json
+*service_account*.json
+*credentials*.json
+movierecommendation-*.json
+movierecommendation-445114-71340ccf2a90.json
+
+# Virtual environments
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter / Colab
+.ipynb_checkpoints
+
+# IDEs and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
